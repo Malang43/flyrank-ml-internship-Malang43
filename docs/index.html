@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Predicting Future Content Performance Decline | FlyRank ML Capstone</title>
+
+<meta name="description"
+content="Machine-learning research capstone for prioritizing content pages for human review using pseudonymized FlyRank search and engagement data.">
+
+<style>
+
+:root {
+    --navy: #10203a;
+    --blue: #2457d6;
+    --blue-dark: #173b96;
+    --text: #1d2738;
+    --muted: #657084;
+    --line: #dfe5ee;
+    --background: #f5f7fa;
+    --soft-blue: #f3f6fc;
+    --green: #edf8f1;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--text);
+    line-height: 1.72;
+}
+
+a {
+    color: var(--blue);
+}
+
+.hero {
+    background:
+      radial-gradient(circle at top right,
+      rgba(71,119,220,.35), transparent 35%),
+      linear-gradient(135deg,#0d172a,#17305b 65%,#214a89);
+    color: white;
+    padding: 80px 25px 65px;
+}
+
+.container {
+    width: min(1050px, calc(100% - 40px));
+    margin: auto;
+}
+
+.kicker {
+    text-transform: uppercase;
+    letter-spacing: .13em;
+    font-weight: 700;
+    font-size: 13px;
+    color: #c7d8ff;
+}
+
+h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(38px,6vw,67px);
+    line-height: 1.05;
+    max-width: 960px;
+    margin: 14px 0 20px;
+}
+
+.subtitle {
+    max-width: 850px;
+    font-size: 19px;
+    color: #dbe5f8;
+}
+
+.author {
+    margin-top: 28px;
+    color: #c9d7ee;
+}
+
+.buttons {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.buttons a {
+    text-decoration: none;
+    padding: 11px 17px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.4);
+    color: white;
+    font-weight: 650;
+}
+
+.buttons a:first-child {
+    background: white;
+    color: var(--blue-dark);
+}
+
+nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid var(--line);
+}
+
+.nav-inner {
+    display: flex;
+    gap: 21px;
+    padding: 13px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+nav a {
+    text-decoration: none;
+    color: #596578;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.paper {
+    background: white;
+    margin: 32px auto;
+    padding: clamp(30px,6vw,72px);
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 35px rgba(21,37,68,.07);
+}
+
+section {
+    margin-bottom: 65px;
+}
+
+h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 32px;
+    color: var(--navy);
+    margin-bottom: 18px;
+}
+
+h3 {
+    margin-top: 32px;
+    color: var(--navy);
+}
+
+.abstract {
+    background: var(--soft-blue);
+    padding: 27px 30px;
+    border-left: 4px solid var(--blue);
+    border-radius: 0 14px 14px 0;
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 14px;
+    margin: 35px 0 65px;
+}
+
+.metric {
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    padding: 22px;
+}
+
+.metric strong {
+    display: block;
+    font-size: 30px;
+    color: var(--blue-dark);
+}
+
+.metric span {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.research-question {
+    background: #f3f5f8;
+    border-radius: 12px;
+    padding: 21px;
+}
+
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 25px 0;
+}
+
+.card {
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    padding: 22px;
+}
+
+.equation {
+    background: #f7f8fa;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 22px;
+    margin: 20px 0;
+    font-family: "Courier New", monospace;
+    text-align: center;
+    font-size: 17px;
+}
+
+.figure {
+    margin: 34px 0;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    padding: 18px;
+}
+
+.figure img {
+    width: 100%;
+    display: block;
+}
+
+.caption {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 11px 4px 0;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 650px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin: 25px 0;
+}
+
+th,
+td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+}
+
+th {
+    background: #f5f7fa;
+    color: #596578;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.highlight {
+    background: var(--green);
+}
+
+.callout {
+    padding: 21px;
+    background: #fff8e8;
+    border: 1px solid #ead59a;
+    border-radius: 12px;
+    margin: 22px 0;
+}
+
+ul li {
+    margin: 9px 0;
+}
+
+code {
+    background: #edf1f5;
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+footer {
+    padding: 15px 0 50px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+@media(max-width:760px) {
+
+    .metrics {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .paper {
+        padding: 28px 20px;
+    }
+}
+
+@media(max-width:430px) {
+
+    .metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<header class="hero">
+
+<div class="container">
+
+<div class="kicker">
+FlyRank Machine Learning Capstone
+</div>
+
+<h1>
+Predicting Future Content Performance Decline for Search-Intelligence Review Prioritization
+</h1>
+
+<p class="subtitle">
+A client-grouped evaluation of transparent rules and machine-learning
+models for ranking content pages that deserve human review first.
+</p>
+
+<p class="author">
+<strong>Muhammad Farhat Mehdi</strong><br>
+Machine Learning Internship · FlyRank · 2026
+</p>
+
+<div class="buttons">
+
+<a href="https://github.com/Malang43/flyrank-ml-internship-Malang43"
+target="_blank">
+View Repository
+</a>
+
+<a href="https://github.com/Malang43/flyrank-ml-internship-Malang43/blob/main/work/notebooks/capstone.ipynb"
+target="_blank">
+Capstone Notebook
+</a>
+
+</div>
+
+</div>
+</header>
+
+
+<nav>
+
+<div class="container nav-inner">
+
+<a href="#abstract">Abstract</a>
+<a href="#introduction">Introduction</a>
+<a href="#data">Data</a>
+<a href="#methodology">Methodology</a>
+<a href="#results">Results</a>
+<a href="#limitations">Limitations</a>
+<a href="#recommendations">Recommendations</a>
+<a href="#reproducibility">Reproducibility</a>
+<a href="#acknowledgments">Acknowledgments</a>
+
+</div>
+
+</nav>
+
+
+<main class="container paper">
+
+
+<section id="abstract" class="abstract">
+
+<h2>Abstract</h2>
+
+<p>
+Content teams often manage more pages than they can manually review,
+creating a practical need to prioritize limited human attention.
+This study uses pseudonymized FlyRank search and engagement data,
+aggregating March 2026 observations for 100,893 client-content records
+and measuring an April 2026 future-decline proxy.
+A transparent rule baseline was compared with Logistic Regression,
+Random Forest, and Histogram Gradient Boosting under a client-grouped
+holdout with zero client overlap, using Precision@50 as the primary
+decision metric.
+Logistic Regression achieved Precision@50 of 0.66 compared with 0.48
+for the rule baseline, representing a 37.5% relative improvement,
+while the more complex models did not improve the top-50 ranking.
+The resulting system is intended to support human page-review
+prioritization and does not establish causal effects of content changes
+or universal future performance.
+</p>
+
+</section>
+
+
+<div class="metrics">
+
+<div class="metric">
+<strong>100,893</strong>
+<span>final modeling observations</span>
+</div>
+
+<div class="metric">
+<strong>0.66</strong>
+<span>grouped-client Precision@50</span>
+</div>
+
+<div class="metric">
+<strong>0.48</strong>
+<span>rule-baseline Precision@50</span>
+</div>
+
+<div class="metric">
+<strong>37.5%</strong>
+<span>relative top-50 improvement</span>
+</div>
+
+</div>
+
+
+<section id="introduction">
+
+<h2>1. Introduction / Problem Statement</h2>
+
+<p>
+Content and search teams may monitor thousands of pages while having
+capacity to inspect only a small fraction of them. The operational
+problem is therefore not simply whether a page can be classified as
+healthy or declining, but which pages should receive human attention
+first.
+</p>
+
+<div class="research-question">
+
+<strong>Research question:</strong>
+
+Can observable search and engagement signals measured before a decision
+point help predict future content-performance decline and produce a
+more useful ranked page-review queue than a transparent hand-written
+rule?
+
+</div>
+
+<p>
+The system is designed as decision support. It ranks review candidates;
+it does not automatically rewrite or modify content. Because review
+capacity is limited, Precision@50 is used as the principal operational
+metric.
+</p>
+
+</section>
+
+
+<section id="data">
+
+<h2>2. Data</h2>
+
+<p>
+The analysis is built on the pseudonymized FlyRank ML Internship
+warehouse release
+<code>flyrank_pseudonymized_warehouse_release_v20260703</code>.
+The warehouse includes approximately 79 million daily performance
+records. The final experiment uses
+<code>fact_content_daily_performance</code> and aggregates daily
+observations to one pseudonymized client-content record per feature
+window.
+</p>
+
+<div class="two-column">
+
+<div class="card">
+
+<h3>Feature window</h3>
+
+<p>
+<strong>March 1–31, 2026</strong>
+</p>
+
+<p>
+Search and engagement measurements are observed before the outcome
+period.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h3>Outcome window</h3>
+
+<p>
+<strong>April 1–30, 2026</strong>
+</p>
+
+<p>
+April impressions are used only to construct the future outcome.
+</p>
+
+</div>
+
+</div>
+
+
+<p>
+Pages were retained when March contained at least 100 GSC impressions.
+After aggregation, eligibility filtering, and matching to the future
+outcome period, the final modeling dataset contained
+<strong>100,893 observations</strong>.
+</p>
+
+
+<h3>Predictive features</h3>
+
+<ul>
+
+<li>31-day GSC impressions</li>
+<li>31-day GSC clicks</li>
+<li>31-day click-through rate</li>
+<li>31-day average search position</li>
+<li>31-day GA4 sessions</li>
+
+</ul>
+
+
+<h3>Public-safety exclusions</h3>
+
+<p>
+Client names, domains, URLs, private queries, credentials, raw private
+content, target-derived fields, future-window values, FlyRank product
+scores, and decision flags were excluded from predictors and from the
+public artifact.
+</p>
+
+</section>
+
+
+<section id="methodology">
+
+<h2>3. Methodology</h2>
+
+
+<h3>3.1 Unit of analysis</h3>
+
+<p>
+One observation represents one pseudonymized
+<strong>client × content page</strong>.
+</p>
+
+
+<h3>3.2 Future-decline proxy</h3>
+
+<div class="equation">
+
+future_decline = 1 if April impressions &lt; 0.80 × March impressions
+
+</div>
+
+<p>
+Otherwise, the label is 0. The 20% threshold is an operational study
+definition rather than a universal definition of poor content quality
+or refresh need.
+</p>
+
+
+<h3>3.3 Transparent baseline</h3>
+
+<p>
+The Week-4 baseline prioritized pages with meaningful search visibility,
+average position within the first 20 results, and relatively weak CTR.
+The baseline provides a simple and interpretable reference that the
+machine-learning model must honestly outperform.
+</p>
+
+
+<h3>3.4 Models</h3>
+
+<p>
+Three learned approaches were evaluated:
+</p>
+
+<ul>
+
+<li>Logistic Regression</li>
+<li>Random Forest</li>
+<li>Histogram Gradient Boosting</li>
+
+</ul>
+
+<p>
+Logistic Regression was ultimately selected because it achieved the
+highest Precision@50, the primary operational metric. Greater model
+complexity was not rewarded when it did not improve the review queue.
+</p>
+
+
+<h3>3.5 Grouped validation</h3>
+
+<p>
+The final evaluation used a client-grouped holdout. All pages belonging
+to a test client were kept outside training.
+</p>
+
+<ul>
+
+<li>Training observations: 85,702</li>
+<li>Test observations: 15,191</li>
+<li>Training clients: 34</li>
+<li>Test clients: 9</li>
+<li>Client overlap: 0</li>
+
+</ul>
+
+
+<div class="figure">
+
+<img src="assets/validation_comparison.svg"
+alt="Comparison of random row and grouped client validation">
+
+<p class="caption">
+Figure 1. Precision@50 decreased from 0.72 under a random row split to
+0.66 under the more conservative grouped-client holdout. The grouped
+result is therefore used as the principal performance estimate.
+</p>
+
+</div>
+
+
+<h3>3.6 Leakage audit</h3>
+
+<p>
+The final feature set contains only measurements available during
+March 2026. April impressions, the target, label copies, future values,
+FlyRank product scores, action fields, and target-derived variables were
+not included as predictive features. Client and content identifiers were
+used only for joining and grouping.
+</p>
+
+</section>
+
+
+<section id="results">
+
+<h2>4. Results</h2>
+
+<p>
+Logistic Regression produced the strongest top-of-queue performance.
+Precision@50 improved from 0.48 for the transparent rule baseline to
+0.66 for Logistic Regression on the same grouped holdout.
+</p>
+
+
+<div class="figure">
+
+<img src="assets/model_comparison.svg"
+alt="Model versus baseline Precision at 50 comparison">
+
+<p class="caption">
+Figure 2. Model comparison using Precision@50 on the same
+client-grouped test set.
+</p>
+
+</div>
+
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Method</th>
+<th>Precision@50</th>
+<th>ROC-AUC</th>
+<th>Average Precision</th>
+</tr>
+
+</thead>
+
+
+<tbody>
+
+<tr>
+
+<td>Week-4 Rule Baseline</td>
+<td>0.480</td>
+<td>0.511</td>
+<td>0.421</td>
+
+</tr>
+
+
+<tr class="highlight">
+
+<td><strong>Logistic Regression</strong></td>
+<td><strong>0.660</strong></td>
+<td>0.573</td>
+<td>0.484</td>
+
+</tr>
+
+
+<tr>
+
+<td>Random Forest</td>
+<td>0.580</td>
+<td><strong>0.584</strong></td>
+<td>0.484</td>
+
+</tr>
+
+
+<tr>
+
+<td>Histogram Gradient Boosting</td>
+<td>0.560</td>
+<td>0.581</td>
+<td><strong>0.486</strong></td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<h3>Operational interpretation</h3>
+
+<p>
+At Precision@50 = 0.66, approximately 33 of the model's top 50
+recommendations met the study's future-decline proxy, compared with
+approximately 24 of the baseline's top 50.
+</p>
+
+
+<p>
+The relative improvement in the primary metric is:
+</p>
+
+
+<div class="equation">
+
+(0.66 - 0.48) / 0.48 × 100 = 37.5%
+
+</div>
+
+
+<p>
+Random Forest and Histogram Gradient Boosting achieved slightly higher
+ROC-AUC or Average Precision values, but neither improved the operational
+top-50 queue. Logistic Regression was therefore retained as the final
+model.
+</p>
+
+
+<p>
+This result supports improved review prioritization within the defined
+experiment. It does not establish universal future performance.
+</p>
+
+</section>
+
+
+<section id="limitations">
+
+<h2>5. Limitations & Honest Framing</h2>
+
+<ul>
+
+<li>
+The main experiment uses one March-to-April 2026 transition, so
+performance stability across other seasons and future periods has not
+been established.
+</li>
+
+<li>
+The 20% decline threshold is an operational proxy rather than a universal
+definition of content quality or refresh need.
+</li>
+
+<li>
+The March feature window contains 31 days while April contains 30 days.
+The relatively large decline threshold reduces but does not completely
+remove calendar-length effects.
+</li>
+
+<li>
+The final inner merge requires pages to appear in both March and April.
+Pages absent from the April data are excluded, potentially omitting
+some severe decline or tracking-loss cases.
+</li>
+
+<li>
+Analytics availability is not perfectly balanced across clients and
+periods. Zero-filled session values can in some cases mix genuine zero
+activity with unavailable measurements.
+</li>
+
+<li>
+A client-grouped holdout is more conservative than a random row split,
+but multiple forward-in-time evaluation windows would provide stronger
+evidence before operational deployment.
+</li>
+
+<li>
+The analysis is observational and predictive. It does not demonstrate
+that modifying a recommended page will cause its search performance to
+improve.
+</li>
+
+<li>
+The model does not identify Google's ranking algorithm, and model
+coefficients or feature associations should not be interpreted as
+causal ranking factors.
+</li>
+
+</ul>
+
+</section>
+
+
+<section id="recommendations">
+
+<h2>6. Ranked Recommendations / Action Playbook</h2>
+
+<p>
+The final model produces a ranked page-review queue. The first 50 pages
+form the primary review set because Precision@50 matches the intended
+review capacity.
+</p>
+
+
+<div class="figure">
+
+<img src="assets/action_workflow.svg"
+alt="Workflow from machine-learning model score to human content review">
+
+<p class="caption">
+Figure 3. The model prioritizes investigation. A human reviewer makes
+the final content decision.
+</p>
+
+</div>
+
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Priority</th>
+<th>Reason code</th>
+<th>Suggested human review</th>
+</tr>
+
+</thead>
+
+
+<tbody>
+
+<tr>
+
+<td>1–50</td>
+<td><code>low_ctr_at_visible_position</code></td>
+<td>
+Review search intent, title/snippet fit, and SERP context.
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>1–50</td>
+<td><code>high_visibility_low_clicks</code></td>
+<td>
+Inspect whether substantial visibility is translating into relevant
+clicks.
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>1–50</td>
+<td><code>page_one_click_gap</code></td>
+<td>
+Review page-one visibility together with click capture and intent mix.
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>1–50</td>
+<td><code>combined_model_signal</code></td>
+<td>
+Perform a broader diagnostic review of the page and related content.
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>51–200</td>
+<td>Any reason code</td>
+<td>
+Review if capacity remains after the primary queue.
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>&gt;200</td>
+<td>Lower model priority</td>
+<td>
+Monitor rather than act automatically.
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<div class="callout">
+
+<strong>Human review is mandatory.</strong>
+
+Before changing a page, reviewers should consider search intent,
+query mix, seasonality, SERP changes, related-page consolidation,
+measurement availability, and traffic volume.
+
+The system should not automatically rewrite, delete, merge, prune, or
+publish content.
+
+</div>
+
+</section>
+
+
+<section id="reproducibility">
+
+<h2>7. Reproducibility</h2>
+
+<p>
+The research workflow, code, executed notebooks, validation design, and
+decision-support logic are available in the public internship repository.
+Fixed random seeds are used for reproducible model and split operations
+where applicable.
+</p>
+
+
+<ul>
+
+<li>
+<a target="_blank"
+href="https://github.com/Malang43/flyrank-ml-internship-Malang43">
+Full GitHub repository
+</a>
+</li>
+
+<li>
+<a target="_blank"
+href="https://github.com/Malang43/flyrank-ml-internship-Malang43/blob/main/work/notebooks/w03_data_contract.ipynb">
+Data contract
+</a>
+</li>
+
+<li>
+<a target="_blank"
+href="https://github.com/Malang43/flyrank-ml-internship-Malang43/blob/main/work/notebooks/w04_baseline_score.ipynb">
+Rule baseline
+</a>
+</li>
+
+<li>
+<a target="_blank"
+href="https://github.com/Malang43/flyrank-ml-internship-Malang43/blob/main/work/notebooks/w05_model.ipynb">
+Model comparison
+</a>
+</li>
+
+<li>
+<a target="_blank"
+href="https://github.com/Malang43/flyrank-ml-internship-Malang43/blob/main/work/notebooks/w06_validation_audit.ipynb">
+Validation and claim audit
+</a>
+</li>
+
+<li>
+<a target="_blank"
+href="https://github.com/Malang43/flyrank-ml-internship-Malang43/blob/main/work/notebooks/w07_action_playbook.ipynb">
+Action playbook
+</a>
+</li>
+
+<li>
+<a target="_blank"
+href="https://github.com/Malang43/flyrank-ml-internship-Malang43/blob/main/work/notebooks/capstone.ipynb">
+Final capstone notebook
+</a>
+</li>
+
+</ul>
+
+</section>
+
+
+<section id="acknowledgments">
+
+<h2>8. Acknowledgments & Data Credit</h2>
+
+<p>
+Built on the
+<a href="https://flyrank.ai"
+target="_blank">
+<strong>FlyRank ML Internship dataset</strong>
+</a>.
+</p>
+
+<p>
+The analysis uses a pseudonymized internship data release. The public
+research artifact intentionally excludes client names, domains, URLs,
+private search queries, credentials, and other private information.
+</p>
+
+</section>
+
+
+</main>
+
+
+<footer>
+
+<div class="container">
+
+<strong>Muhammad Farhat Mehdi</strong>
+· FlyRank Machine Learning Capstone · 2026
+
+<br>
+
+<a href="https://github.com/Malang43/flyrank-ml-internship-Malang43">
+Source code and reproducibility
+</a>
+
+</div>
+
+</footer>
+
+
+</body>
+</html>

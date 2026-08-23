@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="360" viewBox="0 0 1000 360">
+  <rect width="1000" height="360" fill="white"/>
+
+  <text x="500" y="42"
+        text-anchor="middle"
+        font-family="Arial, sans-serif"
+        font-size="25"
+        font-weight="700"
+        fill="#172033">
+    From Model Score to Human Review
+  </text>
+
+  <text x="500" y="70"
+        text-anchor="middle"
+        font-family="Arial, sans-serif"
+        font-size="15"
+        fill="#657084">
+    Decision-support workflow for the Refresh / Content Opportunity Scoring lane
+  </text>
+
+  <!-- Box 1 -->
+  <rect x="50" y="125" width="180" height="100"
+        rx="14" fill="#f4f7fd" stroke="#9db4e8" stroke-width="2"/>
+  <text x="140" y="158" text-anchor="middle"
+        font-family="Arial" font-size="17" font-weight="700" fill="#172033">
+    Model Score
+  </text>
+  <text x="140" y="184" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    Estimated decline
+  </text>
+  <text x="140" y="203" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    probability
+  </text>
+
+  <!-- Arrow -->
+  <line x1="230" y1="175" x2="290" y2="175"
+        stroke="#657084" stroke-width="3"/>
+  <polygon points="290,175 278,168 278,182" fill="#657084"/>
+
+  <!-- Box 2 -->
+  <rect x="300" y="125" width="180" height="100"
+        rx="14" fill="#eef4ff" stroke="#7599e8" stroke-width="2"/>
+  <text x="390" y="158" text-anchor="middle"
+        font-family="Arial" font-size="17" font-weight="700" fill="#172033">
+    Ranked Queue
+  </text>
+  <text x="390" y="184" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    Top 50 =
+  </text>
+  <text x="390" y="203" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    review first
+  </text>
+
+  <!-- Arrow -->
+  <line x1="480" y1="175" x2="540" y2="175"
+        stroke="#657084" stroke-width="3"/>
+  <polygon points="540,175 528,168 528,182" fill="#657084"/>
+
+  <!-- Box 3 -->
+  <rect x="550" y="125" width="180" height="100"
+        rx="14" fill="#eaf1ff" stroke="#527edc" stroke-width="2"/>
+  <text x="640" y="158" text-anchor="middle"
+        font-family="Arial" font-size="17" font-weight="700" fill="#172033">
+    Reason Code
+  </text>
+  <text x="640" y="184" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    Explain why the
+  </text>
+  <text x="640" y="203" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    page was surfaced
+  </text>
+
+  <!-- Arrow -->
+  <line x1="730" y1="175" x2="790" y2="175"
+        stroke="#657084" stroke-width="3"/>
+  <polygon points="790,175 778,168 778,182" fill="#657084"/>
+
+  <!-- Box 4 -->
+  <rect x="800" y="125" width="160" height="100"
+        rx="14" fill="#edf8f1" stroke="#61a979" stroke-width="2"/>
+  <text x="880" y="158" text-anchor="middle"
+        font-family="Arial" font-size="17" font-weight="700" fill="#172033">
+    Human Review
+  </text>
+  <text x="880" y="184" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    Diagnose before
+  </text>
+  <text x="880" y="203" text-anchor="middle"
+        font-family="Arial" font-size="13" fill="#657084">
+    taking action
+  </text>
+
+  <rect x="255" y="275" width="490" height="48"
+        rx="12" fill="#fff8e8" stroke="#e5ca80"/>
+
+  <text x="500" y="305"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="14"
+        font-weight="700"
+        fill="#705514">
+    No automatic rewriting, deleting, merging, pruning, or publishing
+  </text>
+</svg>
